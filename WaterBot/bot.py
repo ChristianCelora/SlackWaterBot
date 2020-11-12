@@ -8,11 +8,9 @@ class WaterBot:
         notify = []
         print("notify users")
         for user_id in self.users:
-            if self.users[user_id].next_glass < datetime.now():
-                print(self.users[user_id].id, "need a drink!")
+            if self.users[user_id].next_drink < datetime.now():
                 notify.append(self.users[user_id])
-                self.users[user_id].updateNextDrinkTime()
-            print("user", self.users[user_id].id, "next drink", self.users[user_id].next_glass)
+                self.users[user_id].drink()
         return notify
 
     def addUser(self, user_id: str) -> str:
@@ -40,7 +38,7 @@ class User:
         self.start = start
         self.end = end
         self.last_drink = datetime.now()
-        self.next_glass = datetime.now()
+        self.next_drink = datetime.now()
         self.setDailyWater(water)
 
     def deltaTime(self) -> int:
@@ -48,13 +46,19 @@ class User:
         h2, m2 = self.end.split(":")
         return (int(h2)*60 + int(m2)) - (int(h1)*60 + int(m1))
 
-    def updateNextDrinkTime(self) -> datetime:
+    def __updateNextDrinkTime(self) -> datetime:
         time_before_drink = int(self.deltaTime() / self.glass)
-        memo = self.next_glass
-        self.next_glass = self.last_drink + timedelta(minutes = time_before_drink)
-        self.last_drink = memo
+        self.next_drink = self.last_drink + timedelta(minutes = time_before_drink)
         print("last_drink", self.last_drink)
+        print("next_drink", self.next_drink)
     
     def setDailyWater(self, water: int):
-        self.glass = water * self.GLASS_PER_LITER
-        self.updateNextDrinkTime() # Updates next drink
+        self.glass = int(water * self.GLASS_PER_LITER)
+        print(self.glass)
+        self.__updateNextDrinkTime() # Updates next drink
+
+    def drink(self):
+        memo = self.next_drink
+        #self.last_drink = self.next_drink
+        self.__updateNextDrinkTime() # Updates next drink
+        self.last_drink = memo

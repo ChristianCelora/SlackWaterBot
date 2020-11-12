@@ -109,7 +109,7 @@ if __name__ == "__main__":
                 time.sleep(RTM_READ_DELAY)
             except KeyboardInterrupt:
                 sys.exit("Keyboard interrupt")
-            except Error as e:
+            except Exception as e:
                 print("An exception occurred", sys.exc_info()[0], "msg", str(e))
     else:
         print("Connection failed. Exception traceback printed above.")
