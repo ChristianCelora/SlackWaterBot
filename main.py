@@ -7,7 +7,6 @@ from WaterBot.bot import WaterBot
 import sched, time
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
-slack_client = SlackClient(SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
@@ -49,7 +48,6 @@ def send_message(channel, response):
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
-        as_user=true,
         text=response
     )
 """
@@ -75,12 +73,11 @@ def handle_command(command, channel, user_id):
         try:
             bot.setUserWater(user_id, water)
             response = "Ho aggiornato la tua dose giornaliera di acqua"
-        except:
-            response = "Errore nell'aggiornamento dell'utente"
-    
+        except KeyError:
+            response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
 
     # Sends the response back to the channel
-    #send_message(user_id, response or default_response)
+    #send_message(channel, response or default_response)
     send_message(user_id, response or default_response)
 
 def notifyUsers():
@@ -102,7 +99,7 @@ if __name__ == "__main__":
             try:
                 command, channel, user_id = parse_bot_commands(slack_client.rtm_read())
                 if command:
-                    print(command, channel, user_id)
+                    print("command", command, "ch", channel, "user_id", user_id)
                     handle_command(command, channel, user_id)
                 #notify_users every minute
                 s += RTM_READ_DELAY
@@ -112,8 +109,8 @@ if __name__ == "__main__":
                 time.sleep(RTM_READ_DELAY)
             except KeyboardInterrupt:
                 sys.exit("Keyboard interrupt")
-            except:
-                print("An exception occurred", sys.exc_info()[0])
+            except Error as e:
+                print("An exception occurred", sys.exc_info()[0], "msg", str(e))
     else:
         print("Connection failed. Exception traceback printed above.")
 

@@ -28,7 +28,7 @@ class WaterBot:
 
     def setUserWater(self, user_id: str, water: int):
         if user_id not in self.users:
-            raise KeyError()
+            raise KeyError("User not subscribed")
         self.users[user_id].setDailyWater(water)
         
         
