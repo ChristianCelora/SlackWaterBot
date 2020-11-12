@@ -69,16 +69,17 @@ def handle_command(command, channel, user_id):
         bot.removeUser(user_id)
         response = "Disiscritto da WaterBot"
     elif command.startswith(SET_USER_WATER):
-        command, water = command.split(" ")
         try:
+            command, water = command.split(" ")
             bot.setUserWater(user_id, water)
             response = "Ho aggiornato la tua dose giornaliera di acqua"
         except KeyError:
             response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
-
+        except ValueError:
+            response = "Errore parametro. Il comando deve essere nel formato @WaterBot set x"
     # Sends the response back to the channel
-    #send_message(channel, response or default_response)
-    send_message(user_id, response or default_response)
+    send_message(channel, response or default_response)
+    #send_message(user_id, response or default_response)
 
 def notifyUsers():
     notify_users = bot.update()

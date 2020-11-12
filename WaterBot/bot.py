@@ -49,15 +49,11 @@ class User:
     def __updateNextDrinkTime(self) -> datetime:
         time_before_drink = int(self.deltaTime() / self.glass)
         self.next_drink = self.last_drink + timedelta(minutes = time_before_drink)
-        print("last_drink", self.last_drink)
-        print("next_drink", self.next_drink)
     
     def setDailyWater(self, water: int):
         self.glass = int(water * self.GLASS_PER_LITER)
-        print(self.glass)
         self.__updateNextDrinkTime() # Updates next drink
 
     def drink(self):
-        #self.last_drink = self.next_drink
         self.__updateNextDrinkTime() # Updates next drink
         self.last_drink = datetime.now()
