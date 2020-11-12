@@ -28,7 +28,7 @@ def test_user_delta_time():
     user = User(user_id, 8, "8:00", "8:30")
     assert user.deltaTime() == 30
 
-def test_set_next_drink_time():
+def test_set_next_drink_time_on_water_update():
     user = User("TEST", 2, "8:00", "18:00")
     first_drink = user.next_drink
     expect_date = datetime.now() + timedelta(minutes = int(600/8))
@@ -47,8 +47,12 @@ def test_set_user_water():
 
 def test_user_drink():
     user = User("TEST", 2, "8:00", "18:00")
+    now = datetime.now()
     user.drink()
-    assert user.last_drink != user.next_drink 
+    assert user.last_drink < user.next_drink
+    assert user.last_drink.date() == now.date()                 # date
+    assert user.last_drink.strftime("%H") == now.strftime("%H") # hour
+    assert user.last_drink.strftime("%M") == now.strftime("%M") # minute 
 
 def test_exception_set_user_water():
     with pytest.raises(KeyError):

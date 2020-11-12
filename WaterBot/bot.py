@@ -58,7 +58,6 @@ class User:
         self.__updateNextDrinkTime() # Updates next drink
 
     def drink(self):
-        memo = self.next_drink
         #self.last_drink = self.next_drink
         self.__updateNextDrinkTime() # Updates next drink
-        self.last_drink = memo
+        self.last_drink = datetime.now()
