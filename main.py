@@ -6,8 +6,7 @@ from slackclient import SlackClient
 from WaterBot.bot import WaterBot
 import sched, time
 # instantiate Slack client
-SLACK_BOT_TOKEN = 'xoxb-1468000461938-1496019856884-ko8P8uqIfn1cg0E4figSWe3t' # x velocizzare
-#slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
@@ -50,6 +49,7 @@ def send_message(channel, response):
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
+        as_user=true,
         text=response
     )
 """
