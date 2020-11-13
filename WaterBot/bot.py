@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 class WaterBot:
     def __init__(self):
@@ -15,7 +15,7 @@ class WaterBot:
 
     def addUser(self, user_id: str) -> str:
         if user_id not in self.users:
-            self.users[user_id] = User(user_id, 8, "8:00", "18:00")
+            self.users[user_id] = User(user_id, 8, time(8,0,0), time(18,0,0))
             return "User subscribed"
         return "User alredy subscribed"
 
@@ -28,12 +28,22 @@ class WaterBot:
         if user_id not in self.users:
             raise KeyError("User not subscribed")
         self.users[user_id].setDailyWater(water)
-        
+
+    def setUserTime(self, user_id: str, start: str, end: str):
+        if user_id not in self.users:
+            raise KeyError("User not subscribed")
+        # Will raise ValueError on invalid inputs
+        h1,m1 = [ int(x) for x in start.split(":")]
+        h2,m2 = [ int(x) for x in end.split(":")]
+        if time(h1,m1,0) >= time(h2,m2,0):
+            raise ValueError("End time cannot be earlier than start")
+        self.users[user_id].start = time(h1,m1,0)
+        self.users[user_id].end = time(h2,m2,0)
         
 
 class User:
     GLASS_PER_LITER = 4
-    def __init__(self, user_id: str, water: int, start: str, end: str):
+    def __init__(self, user_id: str, water: int, start: time, end: time):
         self.id = user_id
         self.start = start
         self.end = end
@@ -42,8 +52,8 @@ class User:
         self.setDailyWater(water)
 
     def deltaTime(self) -> int:
-        h1, m1 = self.start.split(":")
-        h2, m2 = self.end.split(":")
+        h1, m1 = self.start.hour, self.start.minute
+        h2, m2 = self.end.hour, self.end.minute
         return (int(h2)*60 + int(m2)) - (int(h1)*60 + int(m1))
 
     def __updateNextDrinkTime(self) -> datetime:

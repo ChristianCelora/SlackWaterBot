@@ -18,6 +18,7 @@ HELP_COMMAND = "help"
 SUBSCRIBE_COMMAND = "subscribe"
 UNSUBSCRIBE_COMMAND = "unsubscribe"
 SET_USER_WATER = "set"
+SET_USER_TIME = "set_time"
 
 bot = WaterBot()
 """
@@ -77,6 +78,9 @@ def handle_command(command, channel, user_id):
             response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
         except ValueError:
             response = "Errore parametro. Il comando deve essere nel formato @WaterBot set x"
+    elif command.startswith(SET_USER_TIME):
+        # your code here
+        
     # Sends the response back to the channel
     send_message(channel, response or default_response)
     #send_message(user_id, response or default_response)
