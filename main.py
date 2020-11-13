@@ -17,8 +17,8 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 HELP_COMMAND = "help"
 SUBSCRIBE_COMMAND = "subscribe"
 UNSUBSCRIBE_COMMAND = "unsubscribe"
-SET_USER_WATER = "set"
-SET_USER_TIME = "set_time"
+SET_USER_WATER = "set:water"
+SET_USER_TIME = "set:time"
 
 bot = WaterBot()
 """
@@ -77,9 +77,17 @@ def handle_command(command, channel, user_id):
         except KeyError:
             response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
         except ValueError:
-            response = "Errore parametro. Il comando deve essere nel formato @WaterBot set x"
+            response = "Errore parametro. Il comando deve essere nel formato @WaterBot *{}* x".format(SET_USER_WATER)
     elif command.startswith(SET_USER_TIME):
         # your code here
+        try:
+            command, start, end = command.split(" ")
+            bot.setUserTime(user_id, start, end)
+            response = "Ho aggiornato i tuo orari di inizio e fine"
+        except KeyError:
+            response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
+        except ValueError:
+            response = "Errore parametro. Il comando deve essere nel formato @WaterBot *{}* xx:yy aa:bb".format(SET_USER_TIME)
         
     # Sends the response back to the channel
     send_message(channel, response or default_response)

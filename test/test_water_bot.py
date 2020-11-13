@@ -75,17 +75,22 @@ def test_refactoring_user_timeframe():
     assert user.end == time(18, 2, 0)
 
 def test_set_user_timeframe():
-    res = bot.addUser("TEST6")
-    res = bot.setUserTime("TEST6", "9:45", "18:45")
-    assert bot.users["TEST6"].start == time(9, 45 ,0)
-    assert bot.users["TEST6"].end == time(18, 45, 0)
+    bot.addUser("TEST6")
+    user = bot.users["TEST6"]
+    expect_time = user.last_drink + timedelta(minutes = int(540/(2*4)))
+    bot.setUserTime("TEST6", "9:45", "18:45")
+    assert user.start == time(9, 45 ,0)
+    assert user.end == time(18, 45, 0)
+    actual_time = user.next_drink
+    assert actual_time.hour == expect_time.hour # hour
+    assert actual_time.minute == expect_time.minute # minute
 
 def test_exception_set_user_timeframe():
     with pytest.raises(KeyError):
         bot.setUserTime("NOT_FOUND", "9:45", "18:45")
 
 def test_exception_refactoring_user_timeframe():
-    res = bot.addUser("TEST7")
+    bot.addUser("TEST7")
     with pytest.raises(ValueError):
         bot.setUserTime("TEST7", "aa", "18:45")
     with pytest.raises(ValueError):
@@ -94,5 +99,3 @@ def test_exception_refactoring_user_timeframe():
         bot.setUserTime("TEST7", "18:02", "8:01")
     with pytest.raises(ValueError):
         bot.setUserTime("TEST7", "aa:02", "8:bb")
-
-
