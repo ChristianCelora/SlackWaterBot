@@ -3,7 +3,7 @@ import time
 import re
 import sys
 from slackclient import SlackClient
-from WaterBot.bot import WaterBot
+from WaterBot.bot import WaterBot, User
 import sched, time
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -19,6 +19,7 @@ SUBSCRIBE_COMMAND = "subscribe"
 UNSUBSCRIBE_COMMAND = "unsubscribe"
 SET_USER_WATER = "set:water"
 SET_USER_TIME = "set:time"
+SHOW_USER = "status"
 
 bot = WaterBot()
 """
@@ -72,7 +73,7 @@ def handle_command(command, channel, user_id):
     elif command.startswith(SET_USER_WATER):
         try:
             command, water = command.split(" ")
-            bot.setUserWater(user_id, water)
+            bot.setUserWater(user_id, int(water))
             response = "Ho aggiornato la tua dose giornaliera di acqua"
         except KeyError:
             response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
@@ -88,6 +89,13 @@ def handle_command(command, channel, user_id):
             response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
         except ValueError:
             response = "Errore parametro. Il comando deve essere nel formato @WaterBot *{}* xx:yy aa:bb".format(SET_USER_TIME)
+    elif command.startswith(SHOW_USER):
+        try:
+            user = bot.getUser(user_id)
+            response = "Ciao! Il tuo consumo di acqua è impostato a {} bicchieri di acqua ({}l) tra le {} e le {}".format(user.glass, user.water, user.start.strftime("%H:%M"), user.end.strftime("%H:%M"))
+            response += "\nLa tua prossima bevuta è alle {}".format(user.next_drink.strftime("%H:%M"))
+        except KeyError:
+            response = "Non sei iscritto. lancia il comando *{}*.".format(SUBSCRIBE_COMMAND)
         
     # Sends the response back to the channel
     send_message(channel, response or default_response)
@@ -96,7 +104,7 @@ def handle_command(command, channel, user_id):
 def notifyUsers():
     notify_users = bot.update()
     for user in notify_users:
-        send_message(user.id, "Prenditi una pausa e bevi un bicchiere!")
+        send_message(user.id, "Prenditi una pausa e bevi un bicchiere \U0001F964!")
 
 
 if __name__ == "__main__":

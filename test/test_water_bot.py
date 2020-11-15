@@ -1,6 +1,5 @@
 import pytest
-from WaterBot.bot import WaterBot
-from WaterBot.bot import User
+from WaterBot.bot import WaterBot, User
 from datetime import datetime, timedelta, time
 
 #INIT
@@ -28,7 +27,7 @@ def test_user_delta_time():
     user = User(user_id, 8, time(8,0,0), time(8,30,0))
     assert user.deltaTime() == 30
 
-def test_set_next_drink_time_on_water_update():
+def test_set_next_drink_time_on_user_init():
     user = User("TEST", 2, time(8,0,0), time(18,0,0))
     first_drink = user.next_drink
     expect_date = datetime.now() + timedelta(minutes = int(600/8))
@@ -44,6 +43,10 @@ def test_set_init_user_water():
     res = bot.setUserWater("TEST4", 4)
     user = bot.users["TEST4"]
     assert bot.users["TEST4"].glass == 16
+
+def test_set_init_user_water_with_string():
+    res = bot.setUserWater("TEST4", "20")
+    assert bot.users["TEST4"].glass == 80
 
 def test_user_drink():
     user = User("TEST", 2, time(8,0,0), time(18,0,0))
@@ -66,6 +69,12 @@ def test_update_user_water():
     assert actual_date.date() == expect_date.date()                 # date
     assert actual_date.strftime("%H") == expect_date.strftime("%H") # hour
     assert actual_date.strftime("%M") == expect_date.strftime("%M") # minute
+
+def test_update_user_water_high_value():
+    liters = 20
+    user = User("TEST", liters, time(8,0,0), time(18,0,0))
+    assert user.water == liters
+    assert user.glass == 20*4
     
 def test_refactoring_user_timeframe():
     user = User("TEST", 2, time(8,1,0), time(18,2,0))
@@ -99,3 +108,12 @@ def test_exception_refactoring_user_timeframe():
         bot.setUserTime("TEST7", "18:02", "8:01")
     with pytest.raises(ValueError):
         bot.setUserTime("TEST7", "aa:02", "8:bb")
+
+def test_get_user_info():
+    bot.addUser("TEST8")
+    user_data = bot.getUser("TEST8")
+    assert user_data == bot.users["TEST8"]
+
+def test_get_user_not_found_info():
+    with pytest.raises(KeyError):
+        bot.getUser("NOT_FOUND")
