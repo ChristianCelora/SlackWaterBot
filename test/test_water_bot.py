@@ -1,10 +1,25 @@
 import pytest
 from WaterBot.bot import WaterBot, User
-from datetime import datetime, timedelta, time
+from freezegun import freeze_time
+from datetime import datetime, timedelta, time, date
 
-#INIT
+# INIT
 bot = WaterBot()
+# mock datetime.now()
+NOW = datetime.now()
+"""FAKE_TIME = datetime.datetime(NOW.year, NOW.month, NOW.day, 14, 0, 0)
+@pytest.fixture
+def mock_datetime_now(monkeypatch):
+    class mydatetime:
+        @classmethod
+        def now(cls):
+            return FAKE_TIME
+    monkeypatch.setattr(datetime, 'datetime', mydatetime)
 
+def test_patch_datetime(mock_datetime_now):
+    assert datetime.datetime.now() == FAKE_TIME"""
+
+# TESTS
 def test_subscribe_user():
     bot.addUser("TEST1")
     assert "TEST1" in bot.users
@@ -27,6 +42,7 @@ def test_user_delta_time():
     user = User(user_id, 8, time(8,0,0), time(8,30,0))
     assert user.deltaTime() == 30
 
+@freeze_time(datetime.today().strftime("%Y-%m-%d")+" 14:00:00")
 def test_set_next_drink_time_on_user_init():
     user = User("TEST", 2, time(8,0,0), time(18,0,0))
     first_drink = user.next_drink
@@ -37,7 +53,8 @@ def test_set_next_drink_time_on_user_init():
 
 def test_update_users():
     res = bot.addUser("TEST4")
-    bot.update()
+    users = bot.update()
+    assert type(users) == list
 
 def test_set_init_user_water():
     res = bot.setUserWater("TEST4", 4)
@@ -61,6 +78,7 @@ def test_exception_set_user_water():
     with pytest.raises(KeyError):
         bot.setUserWater("NOT_FOUND", 4)
 
+@freeze_time(datetime.today().strftime("%Y-%m-%d")+" 14:00:00")
 def test_update_user_water():
     liters = 4
     user = User("TEST", liters, time(8,0,0), time(18,0,0))
@@ -78,11 +96,10 @@ def test_update_user_water_high_value():
     
 def test_refactoring_user_timeframe():
     user = User("TEST", 2, time(8,1,0), time(18,2,0))
-    #assert isinstance(user.start, time) == True
-    #assert isinstance(user.end, time) == True
     assert user.start == time(8, 1 ,0)
     assert user.end == time(18, 2, 0)
 
+@freeze_time(datetime.today().strftime("%Y-%m-%d")+" 14:00:00")
 def test_set_user_timeframe():
     bot.addUser("TEST6")
     user = bot.users["TEST6"]
@@ -117,3 +134,20 @@ def test_get_user_info():
 def test_get_user_not_found_info():
     with pytest.raises(KeyError):
         bot.getUser("NOT_FOUND")
+
+def test_update_user_after_end_time():
+    initial_datetime = datetime.combine(date.today(), time(20,0,0))
+    next_datetime = datetime.combine(date.today(), time(22,00,0))
+    with freeze_time(initial_datetime) as frozen_datetime: # manual ticks
+        assert frozen_datetime() == initial_datetime # test freezing
+        bot.addUser("TEST9")
+        bot.setUserTime("TEST9", "9:45", "18:45")
+        bot.users["TEST9"].next_drink = datetime.now() - timedelta(seconds=5)
+        bot.addUser("TEST10")
+        bot.setUserTime("TEST10", "9:45", "22:45")
+        bot.users["TEST10"].next_drink = datetime.now() - timedelta(seconds=5)
+        notify_users = bot.update()
+        frozen_datetime.move_to(next_datetime)
+        notify_users = bot.update()
+        assert bot.users["TEST9"] not in notify_users
+        assert bot.users["TEST10"] in notify_users

@@ -66,7 +66,7 @@ def handle_command(command, channel, user_id):
         response = "Sono un bot che ti ricorda di bere!"
     elif command.startswith(SUBSCRIBE_COMMAND):
         bot.addUser(user_id)
-        response = "Ti sei iscritto al programma di WaterBot"
+        response = "Benvenuto nel programma di WaterBot"
     elif command.startswith(UNSUBSCRIBE_COMMAND):
         bot.removeUser(user_id)
         response = "Disiscritto da WaterBot"
@@ -99,7 +99,6 @@ def handle_command(command, channel, user_id):
         
     # Sends the response back to the channel
     send_message(channel, response or default_response)
-    #send_message(user_id, response or default_response)
 
 def notifyUsers():
     notify_users = bot.update()
@@ -112,9 +111,6 @@ if __name__ == "__main__":
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
-        #s = sched.scheduler(time.time, time.sleep)
-        #s.enter(60, 1, notifyUsers, (s,))
-        #s.run()
         s = 0
         while True:
             try:

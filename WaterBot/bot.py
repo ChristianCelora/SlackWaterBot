@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, date
 
 class User:
     GLASS_PER_LITER = 4
@@ -18,7 +18,11 @@ class User:
 
     def __updateNextDrinkTime(self) -> datetime:
         time_before_drink = int(self.deltaTime() / self.glass)
-        self.next_drink = self.last_drink + timedelta(minutes = time_before_drink)
+        new_time = self.last_drink + timedelta(minutes=time_before_drink)
+        if new_time > datetime.combine(date.today(), self.end):
+            new_time = datetime.combine(date.today(), self.start) + timedelta(days=1)
+
+        self.next_drink = new_time
     
     def setTimeFrame(self, start: time, end: time):
         self.start = start
