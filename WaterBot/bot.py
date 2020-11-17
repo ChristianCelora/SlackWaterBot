@@ -53,7 +53,7 @@ class WaterBot:
     
     def __init__(self, db: pymongo.database.Database):
         self.users = {}
-        self.collection = db.Subscriber
+        self.collection = db.subscriber
 
     def update(self) -> list:
         notify = []

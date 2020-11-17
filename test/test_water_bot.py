@@ -27,6 +27,7 @@ def test_patch_datetime(mock_datetime_now):
 def test_subscribe_user():
     bot.addUser("TEST1")
     assert "TEST1" in bot.users
+    assert db.subscriber.find_one({"user_id": "TEST1"}, {"_id":0}) == bot.users["TEST1"].getDataAsDict()
     bot.removeUser("TEST1")
     assert "TEST1" not in bot.users
 
