@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, time, date
+import json
 
 class User:
     GLASS_PER_LITER = 4
@@ -37,6 +38,15 @@ class User:
     def drink(self):
         self.last_drink = datetime.now()
         self.__updateNextDrinkTime() # Updates next drink
+
+    def getJson(self) -> str:
+        json_data = {
+            "user_id": self.id,
+            "water": self.water,
+            "start": self.start.strftime("%H:%M:%S"),
+            "end": self.end.strftime("%H:%M:%S")
+        }
+        return json.dumps(json_data)
 
 class WaterBot:
     DEFAULT_USER_WATER = 2

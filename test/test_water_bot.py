@@ -159,7 +159,7 @@ def test_get_user_data_as_json():
         "user_id": "TEST",
         "water": 2,
         "start": "08:00:00",
-        "end": "18:00:00",
+        "end": "18:00:00"
     }
     actual_json = user.getJson()
     assert json.dumps(expected_json) == actual_json
