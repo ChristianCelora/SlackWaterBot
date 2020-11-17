@@ -5,6 +5,7 @@ freezegun==1.0.0
 idna==2.10
 importlib-metadata==2.0.0
 iniconfig==1.1.1
+mongomock==3.21.0
 packaging==20.4
 pathlib2==2.3.5
 pluggy==0.13.1
