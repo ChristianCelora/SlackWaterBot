@@ -5,10 +5,21 @@ import sys
 from slackclient import SlackClient
 from WaterBot.bot import WaterBot, User
 import sched, time
+import pymongo
+
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
+
+# connect MongoDB 
+# refactoring in singlethon class + unit test
+mongo_dbname = os.environ.get('MONGO_DBNAME')
+mongo_psw = os.environ.get('MONGO_DEV_PSW')
+conn_str = "mongodb+srv://dev:{}@waterbot.xkmvw.mongodb.net/{}?retryWrites=true&w=majority".format(mongo_psw, mongo_dbname)
+client = pymongo.MongoClient(conn_str)
+db = client.WaterBot
+print(db.name)
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM

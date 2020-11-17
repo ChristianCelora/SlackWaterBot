@@ -2,6 +2,7 @@ import pytest
 from WaterBot.bot import WaterBot, User
 from freezegun import freeze_time
 from datetime import datetime, timedelta, time, date
+import json
 
 # INIT
 bot = WaterBot()
@@ -151,3 +152,14 @@ def test_update_user_after_end_time():
         notify_users = bot.update()
         assert bot.users["TEST9"] not in notify_users
         assert bot.users["TEST10"] in notify_users
+
+def test_get_user_data_as_json():
+    user = User("TEST", 2, time(8,0,0), time(18,0,0))
+    expected_json = {
+        "user_id": "TEST",
+        "water": 2,
+        "start": "08:00:00",
+        "end": "18:00:00",
+    }
+    actual_json = user.getJson()
+    assert json.dumps(expected_json) == actual_json
