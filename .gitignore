@@ -1,2 +1,4 @@
 slackbot/
 .env
+*.pyo
+*.pyc
