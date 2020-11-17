@@ -75,7 +75,8 @@ class WaterBot:
 
     def removeUser(self, user_id: str) -> str:
         if user_id in self.users:
-            self.users.pop(user_id)
+            removed_user = self.users.pop(user_id)
+            self.collection.delete_one({"user_id": removed_user.id})
         return "User unsubscribed"
 
     def setUserWater(self, user_id: str, water: int):
