@@ -83,6 +83,7 @@ class WaterBot:
         if user_id not in self.users:
             raise KeyError("User not subscribed")
         self.users[user_id].setDailyWater(int(water))
+        self.collection.update_one({"user_id":user_id},{"$set":{"water": int(water)}})
 
     def setUserTime(self, user_id: str, start: str, end: str):
         if user_id not in self.users:
@@ -93,6 +94,13 @@ class WaterBot:
         if time(h1,m1,0) >= time(h2,m2,0):
             raise ValueError("End time cannot be earlier than start")
         self.users[user_id].setTimeFrame(time(h1,m1,0), time(h2,m2,0))
+        self.collection.update_one(
+            {"user_id":user_id}, 
+            {"$set":{
+                "start": time(h1,m1,0).strftime("%H:%M:%S"), 
+                "end": time(h2,m2,0).strftime("%H:%M:%S")
+            }}
+        )
 
     def getUser(self, user_id: str) -> User:
         if user_id not in self.users:

@@ -65,7 +65,8 @@ def test_update_users():
 def test_set_init_user_water():
     res = bot.setUserWater("TEST4", 4)
     user = bot.users["TEST4"]
-    assert bot.users["TEST4"].glass == 16
+    assert user.glass == 16
+    assert db.subscriber.find_one({"user_id": "TEST4"}, {"water":1})["water"] == user.water
 
 def test_set_init_user_water_with_string():
     res = bot.setUserWater("TEST4", "20")
@@ -113,6 +114,9 @@ def test_set_user_timeframe():
     bot.setUserTime("TEST6", "9:45", "18:45")
     assert user.start == time(9, 45 ,0)
     assert user.end == time(18, 45, 0)
+    user_saved = db.subscriber.find_one({"user_id": "TEST6"}, {"start":1,"end":1})
+    assert user_saved["start"] == user.start.strftime("%H:%M:%S")
+    assert user_saved["end"] == user.end.strftime("%H:%M:%S")
     actual_time = user.next_drink
     assert actual_time.hour == expect_time.hour # hour
     assert actual_time.minute == expect_time.minute # minute
