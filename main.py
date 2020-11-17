@@ -1,11 +1,10 @@
 import os
-import time
+import sched, time
 import re
 import sys
 from slackclient import SlackClient
 from WaterBot.bot import WaterBot, User
-import sched, time
-import pymongo
+from WaterBot.mongo import MongoConnector
 
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -14,12 +13,7 @@ starterbot_id = None
 
 # connect MongoDB 
 # refactoring in singlethon class + unit test
-mongo_dbname = os.environ.get('MONGO_DBNAME')
-mongo_psw = os.environ.get('MONGO_DEV_PSW')
-conn_str = "mongodb+srv://dev:{}@waterbot.xkmvw.mongodb.net/{}?retryWrites=true&w=majority".format(mongo_psw, mongo_dbname)
-client = pymongo.MongoClient(conn_str)
-db = client.WaterBot
-print(db.name)
+
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
@@ -32,7 +26,7 @@ SET_USER_WATER = "set:water"
 SET_USER_TIME = "set:time"
 SHOW_USER = "status"
 
-bot = WaterBot()
+bot = WaterBot(MongoConnector.getInstance())
 """
     Parses a list of events coming from the Slack RTM API to find bot commands.
     If a bot command is found, this function returns a tuple of command and channel.

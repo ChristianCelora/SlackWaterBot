@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time, date
-import json
+import pymongo
 
 class User:
     GLASS_PER_LITER = 4
@@ -39,21 +39,21 @@ class User:
         self.last_drink = datetime.now()
         self.__updateNextDrinkTime() # Updates next drink
 
-    def getJson(self) -> str:
-        json_data = {
+    def getDataAsDict(self) -> dict:
+        return {
             "user_id": self.id,
             "water": self.water,
             "start": self.start.strftime("%H:%M:%S"),
             "end": self.end.strftime("%H:%M:%S")
         }
-        return json.dumps(json_data)
 
 class WaterBot:
     DEFAULT_USER_WATER = 2
     DEFAULT_USER_TIME = [time(8,0,0), time(18,0,0)] # start 08:00, end 18:00
     
-    def __init__(self):
+    def __init__(self, db: pymongo.database.Database):
         self.users = {}
+        self.collection = db.Subscriber
 
     def update(self) -> list:
         notify = []
@@ -67,7 +67,9 @@ class WaterBot:
 
     def addUser(self, user_id: str) -> str:
         if user_id not in self.users:
-            self.users[user_id] = User(user_id, self.DEFAULT_USER_WATER, self.DEFAULT_USER_TIME[0], self.DEFAULT_USER_TIME[1])
+            user = User(user_id, self.DEFAULT_USER_WATER, self.DEFAULT_USER_TIME[0], self.DEFAULT_USER_TIME[1])
+            self.users[user_id] = user
+            self.collection.insert_one(user.getDataAsDict())
             return "User subscribed"
         return "User alredy subscribed"
 

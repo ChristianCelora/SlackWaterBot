@@ -2,10 +2,13 @@ import pytest
 from WaterBot.bot import WaterBot, User
 from freezegun import freeze_time
 from datetime import datetime, timedelta, time, date
-import json
+# from WaterBot.mongo import MongoConnector # replace with mongo mock
+from WaterBot.mongo import MockMongoManager # mongo mock
 
 # INIT
-bot = WaterBot()
+db = MockMongoManager.getInstance()
+#db = MongoConnector.getInstance()
+bot = WaterBot(db)
 # mock datetime.now()
 NOW = datetime.now()
 """FAKE_TIME = datetime.datetime(NOW.year, NOW.month, NOW.day, 14, 0, 0)
@@ -161,5 +164,4 @@ def test_get_user_data_as_json():
         "start": "08:00:00",
         "end": "18:00:00"
     }
-    actual_json = user.getJson()
-    assert json.dumps(expected_json) == actual_json
+    assert expected_json == user.getDataAsDict()
