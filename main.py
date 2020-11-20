@@ -5,6 +5,7 @@ import sys
 from slackclient import SlackClient
 from WaterBot.bot import WaterBot, User
 from WaterBot.mongo import MongoConnector
+from datetime import time
 
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
