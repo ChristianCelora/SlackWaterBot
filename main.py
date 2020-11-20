@@ -26,7 +26,8 @@ SET_USER_WATER = "set:water"
 SET_USER_TIME = "set:time"
 SHOW_USER = "status"
 
-bot = WaterBot(MongoConnector.getInstance())
+db = MongoConnector.getInstance()
+bot = WaterBot(db)
 """
     Parses a list of events coming from the Slack RTM API to find bot commands.
     If a bot command is found, this function returns a tuple of command and channel.
@@ -105,17 +106,31 @@ def handle_command(command, channel, user_id):
     # Sends the response back to the channel
     send_message(channel, response or default_response)
 
-def notifyUsers():
+def notify_users():
     notify_users = bot.update()
     for user in notify_users:
         send_message(user.id, "Prenditi una pausa e bevi un bicchiere \U0001F964!")
+"""
+    Return time object from string. Emulate time.fromisoformat(). Don't handle timezone
+"""
+def time_from_str(time_str: str) -> time:
+    h,m,s = [ int(x) for x in time_str.split(":")]
+    return time(h,m,s)
 
+def init_subscribers():
+    res = db.subscriber.find()
+    for user in res:
+        print(user)
+        bot.addUser(user["user_id"], user["water"], time_from_str(user["start"]), time_from_str(user["end"]))
+    exit("test exit")
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
+        # Read subscribed users
+        init_subscribers()
         s = 0
         while True:
             try:
@@ -126,7 +141,7 @@ if __name__ == "__main__":
                 #notify_users every minute
                 s += RTM_READ_DELAY
                 if s >= 60:
-                    notifyUsers()
+                    notify_users()
                     s = 0
                 time.sleep(RTM_READ_DELAY)
             except KeyboardInterrupt:

@@ -32,6 +32,21 @@ def test_subscribe_user():
     assert "TEST1" not in bot.users
     assert db.subscriber.find_one({"user_id": "TEST1"}, {"_id":0}) is None
 
+def test_subscribe_user_from_db():
+    user_db = {
+        "user_id": "TEST1",
+        "water": 2,
+        "start": "10:00:00",
+        "end": "22:45:00"
+    }
+    h,m,s = [ int(x) for x in user_db["start"].split(":")]
+    start_time = time(h,m,s)
+    h,m,s = [ int(x) for x in user_db["end"].split(":")]
+    end_time = time(h,m,s)
+    bot.addUser(user_db["user_id"], user_db["water"], start_time, end_time)
+    assert "TEST1" in bot.users
+    assert bot.users["TEST1"].getDataAsDict(WaterBot.TIME_FORMAT) == user_db
+
 def test_subscribe_user_response():
     res = bot.addUser("TEST2")
     assert res == "User subscribed"

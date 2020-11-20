@@ -39,17 +39,18 @@ class User:
         self.last_drink = datetime.now()
         self.__updateNextDrinkTime() # Updates next drink
 
-    def getDataAsDict(self) -> dict:
+    def getDataAsDict(self, time_format="%H:%M:%S") -> dict:
         return {
             "user_id": self.id,
             "water": self.water,
-            "start": self.start.strftime("%H:%M:%S"),
-            "end": self.end.strftime("%H:%M:%S")
+            "start": self.start.strftime(time_format),
+            "end": self.end.strftime(time_format)
         }
 
 class WaterBot:
     DEFAULT_USER_WATER = 2
     DEFAULT_USER_TIME = [time(8,0,0), time(18,0,0)] # start 08:00, end 18:00
+    TIME_FORMAT = "%H:%M:%S"
     
     def __init__(self, db: pymongo.database.Database):
         self.users = {}
@@ -64,12 +65,12 @@ class WaterBot:
                 self.users[user_id].drink()
             print(user_id, "next drink", self.users[user_id].next_drink)
         return notify
-
-    def addUser(self, user_id: str) -> str:
+    
+    def addUser(self, user_id: str, water=2, start=time(8,0,0), end=time(18,0,0)) -> str:
         if user_id not in self.users:
-            user = User(user_id, self.DEFAULT_USER_WATER, self.DEFAULT_USER_TIME[0], self.DEFAULT_USER_TIME[1])
+            user = User(user_id, water, start, end)
             self.users[user_id] = user
-            self.collection.replace_one({"user_id": user_id}, user.getDataAsDict(), True)
+            self.collection.replace_one({"user_id": user_id}, user.getDataAsDict(self.TIME_FORMAT), True)
             return "User subscribed"
         return "User alredy subscribed"
 
@@ -97,8 +98,8 @@ class WaterBot:
         self.collection.update_one(
             {"user_id":user_id}, 
             {"$set":{
-                "start": time(h1,m1,0).strftime("%H:%M:%S"), 
-                "end": time(h2,m2,0).strftime("%H:%M:%S")
+                "start": time(h1,m1,0).strftime(self.TIME_FORMAT), 
+                "end": time(h2,m2,0).strftime(self.TIME_FORMAT)
             }}
         )
 
