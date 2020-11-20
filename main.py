@@ -121,9 +121,7 @@ def time_from_str(time_str: str) -> time:
 def init_subscribers():
     res = db.subscriber.find()
     for user in res:
-        print(user)
         bot.addUser(user["user_id"], user["water"], time_from_str(user["start"]), time_from_str(user["end"]))
-    exit("test exit")
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
