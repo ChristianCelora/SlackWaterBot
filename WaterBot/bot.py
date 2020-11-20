@@ -69,7 +69,7 @@ class WaterBot:
         if user_id not in self.users:
             user = User(user_id, self.DEFAULT_USER_WATER, self.DEFAULT_USER_TIME[0], self.DEFAULT_USER_TIME[1])
             self.users[user_id] = user
-            self.collection.insert_one(user.getDataAsDict())
+            self.collection.replace_one({"user_id": user_id}, user.getDataAsDict(), True)
             return "User subscribed"
         return "User alredy subscribed"
 
