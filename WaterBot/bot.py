@@ -58,12 +58,12 @@ class WaterBot:
 
     def update(self) -> list:
         notify = []
-        print("notify users")
+        #print("notify users")
         for user_id in self.users:
             if self.users[user_id].next_drink < datetime.now():
                 notify.append(self.users[user_id])
                 self.users[user_id].drink()
-            print(user_id, "next drink", self.users[user_id].next_drink)
+            #print(user_id, "next drink", self.users[user_id].next_drink)
         return notify
     
     def addUser(self, user_id: str, water=2, start=time(8,0,0), end=time(18,0,0)) -> str:
