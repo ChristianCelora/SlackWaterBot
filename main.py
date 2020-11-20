@@ -2,13 +2,13 @@ import os
 import sched, time
 import re
 import sys
+import datetime
 from slackclient import SlackClient
 from WaterBot.bot import WaterBot, User
 from WaterBot.mongo import MongoConnector
-from datetime import time
 
 # instantiate Slack client
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient("xoxb-1468000461938-1496019856884-CVdAAhRowCikMbWXpldOEamG")
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
@@ -39,6 +39,7 @@ def parse_bot_commands(slack_events):
         if event["type"] == "message" and not "subtype" in event:
             user_id, message = parse_direct_mention(event["text"])
             if user_id == starterbot_id:
+                print(event)
                 return message, event["channel"], event["user"]
     return None, None, None
 """
@@ -116,7 +117,7 @@ def notify_users():
 """
 def time_from_str(time_str: str) -> time:
     h,m,s = [ int(x) for x in time_str.split(":")]
-    return time(h,m,s)
+    return datetime.time(h,m,s)
 
 def init_subscribers():
     res = db.subscriber.find()
