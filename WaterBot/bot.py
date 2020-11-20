@@ -67,18 +67,19 @@ class WaterBot:
         return notify
     
     def addUser(self, user_id: str, water=2, start=time(8,0,0), end=time(18,0,0)) -> str:
-        if user_id not in self.users:
-            user = User(user_id, water, start, end)
-            self.users[user_id] = user
-            self.collection.replace_one({"user_id": user_id}, user.getDataAsDict(self.TIME_FORMAT), True)
-            return "User subscribed"
-        return "User alredy subscribed"
+        if user_id in self.users:
+            return -1  
+        user = User(user_id, water, start, end)
+        self.users[user_id] = user
+        self.collection.replace_one({"user_id": user_id}, user.getDataAsDict(self.TIME_FORMAT), True)
+        return user_id
 
     def removeUser(self, user_id: str) -> str:
         if user_id in self.users:
             removed_user = self.users.pop(user_id)
             self.collection.delete_one({"user_id": removed_user.id})
-        return "User unsubscribed"
+            return user_id
+        return -1
 
     def setUserWater(self, user_id: str, water: int):
         if user_id not in self.users:

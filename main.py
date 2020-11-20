@@ -8,7 +8,7 @@ from WaterBot.bot import WaterBot, User
 from WaterBot.mongo import MongoConnector
 
 # instantiate Slack client
-slack_client = SlackClient("xoxb-1468000461938-1496019856884-CVdAAhRowCikMbWXpldOEamG")
+slack_client = SlackClient(os.environ.get("SLACK_BOT_TOKEN"))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
@@ -72,8 +72,11 @@ def handle_command(command, channel, user_id):
     if command.startswith(HELP_COMMAND):
         response = "Sono un bot che ti ricorda di bere!"
     elif command.startswith(SUBSCRIBE_COMMAND):
-        bot.addUser(user_id)
-        response = "Benvenuto nel programma di WaterBot"
+        res = bot.addUser(user_id)
+        if res == -1:
+            response = "Sei già iscritto al programma di WaterBot"
+        else:
+            response = "Benvenuto nel programma di WaterBot"
     elif command.startswith(UNSUBSCRIBE_COMMAND):
         bot.removeUser(user_id)
         response = "Disiscritto da WaterBot"

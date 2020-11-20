@@ -49,12 +49,12 @@ def test_subscribe_user_from_db():
 
 def test_subscribe_user_response():
     res = bot.addUser("TEST2")
-    assert res == "User subscribed"
+    assert res == "TEST2"
 
 def test_subscribe_duplicate_user_response():
     res = bot.addUser("TEST3")
     res2 = bot.addUser("TEST3")
-    assert res2 == "User alredy subscribed"
+    assert res2 == -1
 
 def test_user_delta_time():
     user_id = "TEST"
